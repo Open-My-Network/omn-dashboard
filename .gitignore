@@ -12,6 +12,7 @@ yarn.lock
 /build
 
 # misc
+.env
 .vscode
 .eslintcache
 .DS_Store
