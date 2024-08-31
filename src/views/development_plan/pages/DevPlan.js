@@ -11,7 +11,7 @@ const DevPlan = () => {
 
   const fetchDevelopmentPlanData = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/v1/development-plan?page=1&limit=10");
+      const response = await fetch("http://localhost:3000/api/development-plan?page=1&limit=10");
       const result = await response.json();
       setData(result.data);
       setPagination(result.pagination);

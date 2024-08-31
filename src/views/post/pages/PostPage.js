@@ -13,7 +13,7 @@ const PostPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/posts?page=${currentPage}&limit=${postsPerPage}&post_type=${filter.type}&post_status=${filter.status}&sort_order=desc`);
+        const response = await fetch(`http://localhost:3000/api/posts?page=${currentPage}&limit=${postsPerPage}&post_type=${filter.type}&post_status=${filter.status}&sort_order=desc`);
         const result = await response.json();
         if (response.ok) {
           setPosts(result.data);

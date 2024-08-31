@@ -47,7 +47,7 @@ const AddSchoolPage = ({ onSchoolAdded }) => {
     const newSchool = { sch_name, sch_code, sch_est, sch_admin, grades };
 
     try {
-      const response = await fetch('http://localhost:3000/api/v1/schools', {
+      const response = await fetch('http://localhost:3000/api/schools', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

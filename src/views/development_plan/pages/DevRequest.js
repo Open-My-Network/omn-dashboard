@@ -12,7 +12,7 @@ const DevPlanVerification = () => {
 
   const fetchData = async (page) => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/v1/development-plan/verification-request?page=${page}&limit=10`);
+      const response = await axios.get(`http://localhost:3000/api/development-plan/verification-request?page=${page}&limit=10`);
       setData(response.data.data);
       setCurrentPage(response.data.currentPage);
       setTotalPages(response.data.totalPages);
@@ -36,6 +36,7 @@ const DevPlanVerification = () => {
             <th scope="col">SDP Title</th>
             <th scope="col">Goal Title</th>
             <th scope="col">Goal Timeline</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -44,6 +45,7 @@ const DevPlanVerification = () => {
               <td>{item.plan.sdp_title}</td>
               <td>{item.meta.goal_title}</td>
               <td>{item.meta.goal_time_line}</td>
+              <td><a href="">Accept</a> | <a href="">Reject</a> </td>
             </tr>
           ))}
         </tbody>

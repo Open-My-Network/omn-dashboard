@@ -11,7 +11,7 @@ const SchoolPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/schools?page=1&limit=10');
+        const response = await fetch('http://localhost:3000/api/schools?page=1&limit=10');
         const result = await response.json();
         if (response.ok) {
           setSchools(result.data);

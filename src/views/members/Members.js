@@ -4,7 +4,7 @@ import userPagination from "./components/userPagination.js";
 
 const Members = () => {
   const { currentPage, handleNextPage, handlePrevPage } = userPagination();
-  const { data: users, totalPages, loading, error } = userFetchData("http://localhost:3000/api/v1/users", currentPage, 10);
+  const { data: users, totalPages, loading, error } = userFetchData("http://localhost:3000/api/users", currentPage, 10);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error fetching data: {error.message}</p>;
