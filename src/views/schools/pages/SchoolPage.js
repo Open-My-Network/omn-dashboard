@@ -1,137 +1,113 @@
-import React, { useEffect, useState } from 'react';
-import AddSchoolPage from './AddSchoolPage';
+import React, { useState } from 'react';
+import userFetchData from '../../members/services/userFetchData.js';
+import userPagination from '../../members/components/userPagination.js';
+import SchoolDrawer from './SchoolDrawer.js';
+import AddSchoolPage from './AddSchoolPage.js'; // Import AddSchoolPage
 
 const SchoolPage = () => {
-  const [schools, setSchools] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [viewSchool, setViewSchool] = useState(null);
+  const { currentPage, handleNextPage, handlePrevPage } = userPagination();
+  const {
+    data: schools,
+    totalPages,
+    loading,
+    error,
+  } = userFetchData('http://localhost:3000/api/schools', currentPage, 10);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/schools?page=1&limit=10');
-        const result = await response.json();
-        if (response.ok) {
-          setSchools(result.data);
-        } else {
-          setError(result.message);
-        }
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
-
-  const handleSchoolAdded = (newSchool) => {
-    if (newSchool) {
-      setSchools((prevSchools) => [...prevSchools, newSchool]);
-    }
-    closeModal();
-  };
-
-  const handleDeleteSchool = async (schId) => {
-    try {
-      const response = await fetch(`http://localhost:3000/schools?schId=${schId}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        setSchools((prevSchools) => prevSchools.filter((school) => school.id !== schId));
-      } else {
-        const result = await response.json();
-        alert(result.message);
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false); // State to control modal visibility
 
   const handleViewSchool = (school) => {
-    setViewSchool(school);
+    setSelectedSchool(school);
+    setDrawerOpen(true);
   };
 
-  const closeViewModal = () => setViewSchool(null);
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
+    setSelectedSchool(null);
+  };
 
-  if (loading) {
-    return (
-      <div className="text-center mt-4">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  const handleAddSchool = (newSchool) => {
+    // Logic to handle the addition of the new school (e.g., updating the state or refetching data)
+    setModalOpen(false); // Close the modal after adding the school
+  };
 
-  if (error) {
-    return (
-      <div className="text-center mt-4">
-        <div className="alert alert-danger" role="alert">
-          {error}
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error fetching data: {error.message}</p>;
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-end mb-4">
-        <button className="btn btn-primary" onClick={openModal}>New School</button>
+    <div className="container mx-auto p-4">
+      <div className="flex justify-end mb-4">
+        <button className="btn btn-primary" onClick={() => setModalOpen(true)}>
+          Add School
+        </button>
       </div>
-      <table className="table table-striped table-bordered">
-        <thead className="thead-dark">
-          <tr>
-            <th>ID</th>
-            <th>School Name</th>
-            <th>School Code</th>
-            <th>Established Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {schools.map((school) => (
-            <tr key={school.id}>
-              <td>{school.id}</td>
-              <td>{school.sch_name}</td>
-              <td>{school.sch_code}</td>
-              <td>{new Date(school.sch_est).toLocaleDateString()}</td>
-              <td>
-                <button className="btn btn-info me-2" onClick={() => handleViewSchool(school)}>View</button>
-                <button className="btn btn-danger" onClick={() => handleDeleteSchool(school.id)}>Delete</button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="table table-dark table-bordered">
+          <thead className="thead-dark">
+            <tr>
+              <th>ID</th>
+              <th>School Name</th>
+              <th>School Code</th>
+              <th>Established Date</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {showModal && <AddSchoolPage onSchoolAdded={handleSchoolAdded} />}
-      {showModal && <div className="modal-backdrop fade show"></div>}
-      {viewSchool && (
+          </thead>
+          <tbody>
+            {schools.map((school, index) => (
+              <tr key={school.id}>
+                <td className="px-6 py-4">{(currentPage - 1) * 10 + index + 1}</td>
+                <td>{school.sch_name}</td>
+                <td>{school.sch_code}</td>
+                <td>{new Date(school.sch_est).toLocaleDateString()}</td>
+                <td>
+                  <button className="btn btn-info me-2" onClick={() => handleViewSchool(school)}>
+                    View
+                  </button>
+                  <button className="btn btn-danger">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex justify-between mt-4">
+        <button
+          className={`btn btn-secondary ${currentPage === 1 ? 'disabled' : ''}`}
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="text-white">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className={`btn btn-secondary ${currentPage === totalPages ? 'disabled' : ''}`}
+          onClick={() => handleNextPage(totalPages)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+      <SchoolDrawer school={selectedSchool} isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
+      
+      {/* Bootstrap Modal for Adding School */}
+      {isModalOpen && (
         <div className="modal show" tabIndex="-1" role="dialog" style={{ display: 'block' }}>
           <div className="modal-dialog" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">School Details</h5>
-                <button type="button" className="btn-close" onClick={closeViewModal}></button>
+                <h5 className="modal-title">Add New School</h5>
+                <button type="button" className="btn-close" onClick={() => setModalOpen(false)}></button>
               </div>
               <div className="modal-body">
-                <p><strong>School Name:</strong> {viewSchool.sch_name}</p>
-                <p><strong>School Code:</strong> {viewSchool.sch_code}</p>
-                <p><strong>Established Date:</strong> {new Date(viewSchool.sch_est).toLocaleDateString()}</p>
-                <p><strong>School Admin:</strong> {viewSchool.meta.find(meta => meta.meta_key === 'sch_admin')?.meta_value}</p>
-                <p><strong>Grades:</strong> {viewSchool.meta.filter(meta => meta.meta_key === 'grade').map(meta => meta.meta_value).join(', ')}</p>
+                <AddSchoolPage onSchoolAdded={handleAddSchool} />
               </div>
             </div>
           </div>
         </div>
       )}
-      {viewSchool && <div className="modal-backdrop fade show"></div>}
     </div>
   );
 };

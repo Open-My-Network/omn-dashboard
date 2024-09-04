@@ -1,23 +1,26 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from 'react';
 
 const userFetchData = (url, page, limit) => {
   const [data, setData] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
-        const response = await axios.get(`${url}?page=${page}&limit=${limit}`);
-        const responseData = response.data;
-        setData(responseData.data);
-        setTotalPages(responseData.pagination.totalPages);
-        setLoading(false);
+        const response = await fetch(`${url}?page=${page}&limit=${limit}`);
+        const result = await response.json();
+
+        if (response.ok) {
+          setData(result.data);
+          setTotalPages(result.totalPages || Math.ceil(result.total / limit));
+        } else {
+          setError(result.message || 'Something went wrong');
+        }
       } catch (err) {
         setError(err);
+      } finally {
         setLoading(false);
       }
     };
