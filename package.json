@@ -1,17 +1,10 @@
 {
-  "name": "@coreui/coreui-free-react-admin-template",
+  "name": "openmynetwork",
   "version": "5.1.0",
-  "description": "CoreUI Free React Admin Template",
-  "homepage": ".",
-  "bugs": {
-    "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
-  },
+  "description": "Open My Network",
+  "homepage": "https://site.openmynetwork.com/wp-dashboard/",
   "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
+  "author": "Open My Network",
   "scripts": {
     "build": "vite build",
     "lint": "eslint \"src/**/*.js\"",
@@ -31,6 +24,7 @@
     "chart.js": "^4.4.3",
     "classnames": "^2.5.1",
     "core-js": "^3.37.1",
+    "dotenv": "^16.4.5",
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",

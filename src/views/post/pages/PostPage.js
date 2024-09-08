@@ -1,39 +1,33 @@
-import React, { useState } from "react";
-import postFetchData from "../services/postFetchData.js";
-import postPagination from "../components/postPagination.js";
+import React, { useState } from 'react';
+import fetchApiData from '../../../services/FetchData.js';
+import pagePagination from '../../../services/PaginateData.js';
 
 const PostPage = () => {
-  // State for current page, post type, sort order, and filters
-  const { currentPage, handleNextPage, handlePrevPage } = postPagination();
-  const [postType, setPostType] = useState("leep");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [postType, setPostType] = useState('');
+  const [postStatus, setPostStatus] = useState('');
+  const [filterApplied, setFilterApplied] = useState(false); // State to track if filter is applied
+  const { currentPage, handleNextPage, handlePrevPage } = pagePagination(1);
 
-  // State for pending changes (not yet applied)
-  const [pendingPostType, setPendingPostType] = useState("leep");
-  const [pendingSortOrder, setPendingSortOrder] = useState("asc");
+  // Use conditional queryParams based on filterApplied
+  const queryParams = filterApplied ? { post_type: postType, post_status: postStatus } : {};
 
-  // Fetch data using the current state
-  const { data: users, totalPages, loading, error } = postFetchData(
-    "http://localhost:3000/api/posts",
-    currentPage,
-    10,
-    postType,
-    sortOrder
-  );
+  const {
+    data: users,
+    totalPages = 1,
+    loading,
+    error,
+  } = fetchApiData('http://localhost:3000/api/posts', currentPage, 10, queryParams);
 
-  // Handle applying the changes
-  const handleApplyFilters = () => {
-    setPostType(pendingPostType);
-    setSortOrder(pendingSortOrder);
-  };
-
-  // Handle change events for post type and sort order
   const handlePostTypeChange = (e) => {
-    setPendingPostType(e.target.value);
+    setPostType(e.target.value);
   };
 
-  const handleSortOrderChange = (e) => {
-    setPendingSortOrder(e.target.value);
+  const handlePostStatusChange = (e) => {
+    setPostStatus(e.target.value);
+  };
+
+  const applyFilters = () => {
+    setFilterApplied(true);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -41,46 +35,40 @@ const PostPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="mb-4 flex justify-between items-center">
-        <div>
-          <label htmlFor="postType" className="text-white mr-2">
-            Select Post Type:
+      {/* Filters and Button */}
+      <div className="flex items-center mb-4 space-x-4">
+        <div className="flex items-center">
+          <label htmlFor="postType" className="mr-2">
+            Filter by Post Type:
           </label>
-          <select
-            id="postType"
-            value={pendingPostType}
-            onChange={handlePostTypeChange}
-            className="form-select"
-          >
+          <select id="postType" value={postType} onChange={handlePostTypeChange} className="form-select">
+            <option value="">All</option>
+            <option value="page">Page</option>
             <option value="leep">Leep</option>
-            <option value="post">Post</option>
             <option value="survey">Survey</option>
+            <option value="post">Post</option>
           </select>
         </div>
-        <div>
-          <label htmlFor="sortOrder" className="text-white mr-2">
-            Sort Order:
+
+        <div className="flex items-center">
+          <label htmlFor="postStatus" className="mr-2">
+            Filter by Post Status:
           </label>
-          <select
-            id="sortOrder"
-            value={pendingSortOrder}
-            onChange={handleSortOrderChange}
-            className="form-select"
-          >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
+          <select id="postStatus" value={postStatus} onChange={handlePostStatusChange} className="form-select">
+            <option value="">All</option>
+            <option value="publish">Publish</option>
+            <option value="draft">Draft</option>
+            <option value="auto-draft">Auto Draft</option>
+            <option value="inherit">Inherit</option>
           </select>
         </div>
-        <div>
-          <button
-            className="btn btn-primary"
-            onClick={handleApplyFilters}
-          >
-            Apply
-          </button>
-        </div>
+
+        <button className="btn btn-primary ml-4" onClick={applyFilters}>
+          Apply Filters
+        </button>
       </div>
 
+      {/* Table for displaying data */}
       <div className="overflow-x-auto">
         <table className="table table-dark table-bordered">
           <thead className="thead-dark">
@@ -98,9 +86,7 @@ const PostPage = () => {
                 <td className="px-6 py-4">{(currentPage - 1) * 10 + index + 1}</td>
                 <td className="px-6 py-4">{post.post_title}</td>
                 <td className="px-6 py-4">
-                  <span className="badge rounded-pill text-bg-primary">
-                    {post.post_status}
-                  </span>
+                  <span className="badge rounded-pill text-bg-primary">{post.post_status}</span>
                 </td>
                 <td className="px-6 py-4">{post.post_author}</td>
                 <td className="px-6 py-4">
@@ -112,9 +98,11 @@ const PostPage = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
       <div className="flex justify-between mt-4">
         <button
-          className={`btn btn-secondary ${currentPage === 1 ? "disabled" : ""}`}
+          className={`btn btn-secondary ${currentPage === 1 ? 'disabled' : ''}`}
           onClick={() => handlePrevPage()}
           disabled={currentPage === 1}
         >
@@ -124,7 +112,7 @@ const PostPage = () => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          className={`btn btn-secondary ${currentPage === totalPages ? "disabled" : ""}`}
+          className={`btn btn-secondary ${currentPage === totalPages ? 'disabled' : ''}`}
           onClick={() => handleNextPage(totalPages)}
           disabled={currentPage === totalPages}
         >

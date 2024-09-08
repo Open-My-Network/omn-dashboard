@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import userFetchData from './services/userFetchData.js'
-import userPagination from './components/userPagination.js'
+import fetchApiData from '../../services/FetchData.js'
+import pagePagination from '../../services/PaginateData.js'
 import UserDrawer from './UserDrawer.js'
 
 const Members = () => {
-  const { currentPage, handleNextPage, handlePrevPage } = userPagination()
+  const { currentPage, handleNextPage, handlePrevPage } = pagePagination()
   const {
     data: users,
     totalPages,
     loading,
     error,
-  } = userFetchData('http://localhost:3000/api/users', currentPage, 10)
+  } = fetchApiData(`http://localhost:3000/api/users`, currentPage, 10)
 
   const [selectedUser, setSelectedUser] = useState(null)
   const [isDrawerOpen, setDrawerOpen] = useState(false)

@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import userFetchData from '../../members/services/userFetchData.js';
-import userPagination from '../../members/components/userPagination.js';
+import fetchApiData from '../../../services/FetchData.js';
+import pagePagination from '../../../services/PaginateData.js';
 import SchoolDrawer from './SchoolDrawer.js';
-import AddSchoolPage from './AddSchoolPage.js'; // Import AddSchoolPage
+import AddSchoolPage from './AddSchoolPage.js';
 
 const SchoolPage = () => {
-  const { currentPage, handleNextPage, handlePrevPage } = userPagination();
+  const { currentPage, handleNextPage, handlePrevPage } = pagePagination();
   const {
     data: schools,
     totalPages,
     loading,
     error,
-  } = userFetchData('http://localhost:3000/api/schools', currentPage, 10);
+  } = fetchApiData('http://localhost:3000/api/schools?page=1&limit=10&sort=desc', currentPage, 10);
 
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
