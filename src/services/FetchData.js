@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const fetchApiData = (url, page, limit, queryParams = {}) => {
+const useFetchApiData = (url, page, limit, queryParams = {}) => {
   const [data, setData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -8,6 +8,9 @@ const fetchApiData = (url, page, limit, queryParams = {}) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
       // Convert queryParams object to query string
       const queryString = new URLSearchParams({
         page,
@@ -24,8 +27,6 @@ const fetchApiData = (url, page, limit, queryParams = {}) => {
           const pagination = result.pagination || {};
           const calculatedTotalPages = pagination.totalPages || Math.ceil(pagination.totalCount / limit);
 
-          console.log('Total pages:', calculatedTotalPages);
-
           setTotalPages(calculatedTotalPages);
         } else {
           setError(result.message || 'Something went wrong');
@@ -38,9 +39,9 @@ const fetchApiData = (url, page, limit, queryParams = {}) => {
     };
 
     fetchData();
-  }, [url, page, limit, queryParams]);
+  }, [url, page, limit, JSON.stringify(queryParams)]);
 
   return { data, totalPages, loading, error };
 };
 
-export default fetchApiData;
+export default useFetchApiData;

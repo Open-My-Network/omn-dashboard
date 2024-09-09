@@ -13,7 +13,8 @@ const DevPlanVerification = () => {
   const fetchData = async (page) => {
     try {
       const response = await axios.get(`http://localhost:3000/api/development-plan/verification-request?page=${page}&limit=10`);
-      setData(response.data.data);
+      const filteredData = response.data.data.filter(item => item.meta_key === 'sent_to');
+      setData(filteredData);
       setCurrentPage(response.data.currentPage);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -24,6 +25,32 @@ const DevPlanVerification = () => {
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
+    }
+  };
+
+  const handleAccept = async (item) => {
+    try {
+      // Step 1: Grant points by sending the SDP data
+      await axios.post('http://localhost:3000/api/development-plan/grant-point', {
+        key: "sdp" // Adjust if needed
+      });
+
+      // Step 2: After granting points, update the status to 'completed'
+      await axios.put('http://localhost:3000/api/development-plan/verification-request', {
+        id: item.meta.id,
+        status: 'completed'
+      });
+
+      console.log(item.meta.id);
+
+      // Step 3: Update the local state to reflect the status change
+      setData((prevData) =>
+        prevData.map((currentItem) =>
+          currentItem.id === item.meta.id ? { ...currentItem, status: 'completed' } : currentItem
+        )
+      );
+    } catch (error) {
+      console.error('Error processing acceptance:', error);
     }
   };
 
@@ -45,7 +72,13 @@ const DevPlanVerification = () => {
               <td>{item.plan.sdp_title}</td>
               <td>{item.meta.goal_title}</td>
               <td>{item.meta.goal_time_line}</td>
-              <td><a href="">Accept</a> | <a href="">Reject</a> </td>
+              <td>
+                {item.status === 'completed' ? (
+                  <span>Completed</span>
+                ) : (
+                  <a href="#" onClick={() => handleAccept(item)}>Accept</a>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
