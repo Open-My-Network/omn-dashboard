@@ -1,47 +1,52 @@
-import React, { useState } from 'react';
-import fetchApiData from '../../../services/FetchData.js';
-import pagePagination from '../../../services/PaginateData.js';
+import React, { useState } from 'react'
+import fetchApiData from '../../../services/FetchData.js'
+import pagePagination from '../../../services/PaginateData.js'
 
 const PostPage = () => {
-  const [postType, setPostType] = useState('');
-  const [postStatus, setPostStatus] = useState('');
-  const [filterApplied, setFilterApplied] = useState(false); // State to track if filter is applied
-  const { currentPage, handleNextPage, handlePrevPage } = pagePagination(1);
+  const [postType, setPostType] = useState('')
+  const [postStatus, setPostStatus] = useState('')
+  const [filterApplied, setFilterApplied] = useState(false) // State to track if filter is applied
+  const { currentPage, handleNextPage, handlePrevPage } = pagePagination(1)
 
   // Use conditional queryParams based on filterApplied
-  const queryParams = filterApplied ? { post_type: postType, post_status: postStatus } : {};
+  const queryParams = filterApplied ? { post_type: postType, post_status: postStatus } : {}
 
   const {
     data: users,
     totalPages = 1,
     loading,
     error,
-  } = fetchApiData('http://localhost:3000/api/posts', currentPage, 10, queryParams);
+  } = fetchApiData('http://localhost:3000/api/posts', currentPage, 10, queryParams)
 
   const handlePostTypeChange = (e) => {
-    setPostType(e.target.value);
-  };
+    setPostType(e.target.value)
+  }
 
   const handlePostStatusChange = (e) => {
-    setPostStatus(e.target.value);
-  };
+    setPostStatus(e.target.value)
+  }
 
   const applyFilters = () => {
-    setFilterApplied(true);
-  };
+    setFilterApplied(true)
+  }
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error fetching data: {error.message}</p>;
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>Error fetching data: {error.message}</p>
 
   return (
     <div className="container mx-auto p-4">
       {/* Filters and Button */}
-      <div className="flex items-center mb-4 space-x-4">
-        <div className="flex items-center">
+      <div className="row">
+        <div className="col-lg-4">
           <label htmlFor="postType" className="mr-2">
             Filter by Post Type:
           </label>
-          <select id="postType" value={postType} onChange={handlePostTypeChange} className="form-select">
+          <select
+            id="postType"
+            value={postType}
+            onChange={handlePostTypeChange}
+            className="form-select"
+          >
             <option value="">All</option>
             <option value="page">Page</option>
             <option value="leep">Leep</option>
@@ -49,12 +54,16 @@ const PostPage = () => {
             <option value="post">Post</option>
           </select>
         </div>
-
-        <div className="flex items-center">
+        <div className="col-lg-4">
           <label htmlFor="postStatus" className="mr-2">
             Filter by Post Status:
           </label>
-          <select id="postStatus" value={postStatus} onChange={handlePostStatusChange} className="form-select">
+          <select
+            id="postStatus"
+            value={postStatus}
+            onChange={handlePostStatusChange}
+            className="form-select"
+          >
             <option value="">All</option>
             <option value="publish">Publish</option>
             <option value="draft">Draft</option>
@@ -62,15 +71,21 @@ const PostPage = () => {
             <option value="inherit">Inherit</option>
           </select>
         </div>
+        <div className="col-lg-4">
+          <button className="btn btn-primary ml-4" onClick={applyFilters}>
+            Apply Filters
+          </button>
+        </div>
+      </div>
+      <div className="flex items-center mb-4 space-x-4">
+        <div className="flex items-center"></div>
 
-        <button className="btn btn-primary ml-4" onClick={applyFilters}>
-          Apply Filters
-        </button>
+        <div className="flex items-center"></div>
       </div>
 
       {/* Table for displaying data */}
       <div className="overflow-x-auto">
-        <table className="table table-dark table-bordered">
+        <table className="table table-bordered">
           <thead className="thead-dark">
             <tr>
               <th className="px-6 py-3">S.N.</th>
@@ -89,9 +104,9 @@ const PostPage = () => {
                   <span className="badge rounded-pill text-bg-primary">{post.post_status}</span>
                 </td>
                 <td className="px-6 py-4">{post.post_author}</td>
-                <td className="px-6 py-4">
-                  <button className="btn btn-outline-light btn-sm">Edit</button>
-                  <button className="btn btn-outline-danger btn-sm ml-2">Delete</button>
+                <td className="py-4">
+                  <button className="btn btn-outline-info btn-sm mx-4">Edit</button>
+                  <button className="btn btn-outline-danger btn-sm">Delete</button>
                 </td>
               </tr>
             ))}
@@ -120,7 +135,7 @@ const PostPage = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PostPage;
+export default PostPage

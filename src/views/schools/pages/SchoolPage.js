@@ -15,7 +15,7 @@ const SchoolPage = () => {
 
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false); // State to control modal visibility
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const handleViewSchool = (school) => {
     setSelectedSchool(school);

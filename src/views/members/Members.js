@@ -1,61 +1,111 @@
-import React, { useState } from 'react';
-import useFetchApiData from '../../services/FetchData.js';
-import pagePagination from '../../services/PaginateData.js';
-import UserDrawer from './UserDrawer.js';
+import React, { useState } from 'react'
+import useFetchApiData from '../../services/FetchData.js'
+import pagePagination from '../../services/PaginateData.js'
+import UserDrawer from './UserDrawer.js'
+import AddMember from './AddMember.js'
+import UploadMemberPage from './UploadMember.js'
 
 const Members = () => {
-  const [selectedRole, setSelectedRole] = useState('');
-  const { currentPage, handleNextPage, handlePrevPage } = pagePagination();
-  
-  const { data: users, totalPages, loading, error } = useFetchApiData(
-    'http://localhost:3000/api/users', 
-    currentPage, 
-    10, 
-    { role: selectedRole }
-  );
+  const [selectedRole, setSelectedRole] = useState('')
+  const [selectedOrder, setSelectedOrder] = useState('asc')
+  const { currentPage, handleNextPage, handlePrevPage } = pagePagination()
+  const [isModalOpen, setModalOpen] = useState(false)
 
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const {
+    data: users,
+    totalPages,
+    loading,
+    error,
+  } = useFetchApiData('http://localhost:3000/api/users', currentPage, 10, {
+    role: selectedRole,
+    sort: selectedOrder,
+  })
+
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [isAddDrawerOpen, setAddDrawerOpen] = useState(false)
 
   const handleRoleChange = (event) => {
-    setSelectedRole(event.target.value);
-  };
+    setSelectedRole(event.target.value)
+  }
+
+  const handlOrderChange = (event) => {
+    setSelectedOrder(event.target.value)
+  }
 
   const handleViewUser = (user) => {
-    setSelectedUser(user);
-    setDrawerOpen(true);
-  };
+    setSelectedUser(user)
+    setDrawerOpen(true)
+  }
 
   const handleCloseDrawer = () => {
-    setDrawerOpen(false);
-    setSelectedUser(null);
-  };
+    setDrawerOpen(false)
+    setSelectedUser(null)
+  }
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error fetching data: {error}</p>;
+  const handleShowAddDrawer = () => {
+    setAddDrawerOpen(true)
+  }
+
+  const handleCloseAddDrawer = () => {
+    setAddDrawerOpen(false)
+  }
+
+  const handleAddSchool = (user) => {
+    setModalOpen(false) // Close the modal after adding the school
+  }
+
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>Error fetching data: {error}</p>
 
   return (
     <div className="container mx-auto p-4">
-      {/* Role Filter */}
-      <div className="mb-4">
-        <label htmlFor="roleFilter" className="form-label">Filter by Role:</label>
-        <select
-          id="roleFilter"
-          className="form-select"
-          value={selectedRole}
-          onChange={handleRoleChange}
-        >
-          <option value="">All</option>
-          <option value="administrator">Administrator</option>
-          <option value="principal">Principal</option>
-          <option value="student">Student</option>
-          <option value="subscriber">Subscriber</option>
-          <option value="author">Author</option>
-        </select>
+      <div className="row">
+        <button className="m-4 btn btn-primary col-lg-3" onClick={() => handleShowAddDrawer()}>
+          Add User
+        </button>
+        <button className="m-4 btn btn-primary col-lg-3" onClick={() => setModalOpen(true)}>
+          Upload User
+        </button>
+      </div>
+      {/* Filter */}
+      <div className="row mb-4">
+        <div className="col-lg-6 col-md-6 col-sm-6">
+          <label htmlFor="roleFilter" className="form-label">
+            Filter by Role:
+          </label>
+          <select
+            id="roleFilter"
+            className="form-select"
+            value={selectedRole}
+            onChange={handleRoleChange}
+          >
+            <option value="">All</option>
+            <option value="administrator">Administrator</option>
+            <option value="principal">Principal</option>
+            <option value="student">Student</option>
+            <option value="subscriber">Subscriber</option>
+            <option value="author">Author</option>
+          </select>
+        </div>
+        <div className="col-lg-6 col-md-6 col-sm-6">
+          <label htmlFor="sortFilter" className="form-label">
+            Sort:
+          </label>
+          <select
+            id="sortFilter"
+            className="form-select"
+            value={selectedOrder}
+            onChange={handlOrderChange}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="table table-dark table-bordered">
+        <table className="table table-bordered">
           <thead className="thead-dark">
             <tr>
               <th className="px-6 py-3">S.N.</th>
@@ -90,17 +140,17 @@ const Members = () => {
       </div>
       <div className="flex justify-between mt-4">
         <button
-          className={`btn btn-secondary ${currentPage === 1 ? 'disabled' : ''}`}
+          className={`btn btn-primary ${currentPage === 1 ? 'disabled' : ''}`}
           onClick={() => handlePrevPage()}
           disabled={currentPage === 1}
         >
           Previous
         </button>
-        <span className="text-white">
+        <span className="mx-4">
           Page {currentPage} of {totalPages}
         </span>
         <button
-          className={`btn btn-secondary ${currentPage === totalPages ? 'disabled' : ''}`}
+          className={`btn btn-primary ${currentPage === totalPages ? 'disabled' : ''}`}
           onClick={() => handleNextPage(totalPages)}
           disabled={currentPage === totalPages}
         >
@@ -108,9 +158,13 @@ const Members = () => {
         </button>
       </div>
 
-      <UserDrawer user={selectedUser} isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
-    </div>
-  );
-};
+      {/* display model for upload csv for user */}
+      {isModalOpen && <UploadMemberPage onSchoolAdded={handleAddSchool} />}
 
-export default Members;
+      <UserDrawer user={selectedUser} isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
+      <AddMember isOpen={isAddDrawerOpen} onClose={handleCloseAddDrawer} />
+    </div>
+  )
+}
+
+export default Members

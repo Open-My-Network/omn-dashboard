@@ -35,7 +35,12 @@ const _nav = [
     to: '/posts',
     icon: <CIcon icon={cilNewspaper} customClassName="nav-icon" />,
   },
-
+  {
+    component: CNavItem,
+    name: 'Transfer Points',
+    to: '/transfer-points',
+    icon: <CIcon icon={cilSchool} customClassName="nav-icon" />,
+  },
   {
     component: CNavGroup,
     name: 'Development Plan',

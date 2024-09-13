@@ -17,16 +17,16 @@ const AppHeaderDropdown = () => {
   const navigate = useNavigate() // Initialize navigate
 
   const deleteCookie = (name) => {
-    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
-  }
+    document.cookie = `${name}=; Max-Age=-99999999;`;
+  };
 
-  const logout = () => {
-    // Clear the cookie
-    deleteCookie('auth_token')
-
-    // Redirect to login page or logout page
-    navigate('http://site.openmynetwork.com/login-test')
-  }
+  const handleLogout = () => {
+    // Clear the JWT token cookie
+    deleteCookie('jwt_token');
+    
+    // Redirect to the login page or home page
+    window.location.href = 'https://site.openmynetwork.com/login-test';
+  };
 
   return (
     <CDropdown variant="nav-item">
@@ -50,11 +50,11 @@ const AppHeaderDropdown = () => {
           </CBadge>
         </CDropdownItem>
         <CDropdownHeader className="bg-body-secondary fw-semibold my-2">Settings</CDropdownHeader>
-        <CDropdownItem href="#" onClick={logout}>
+        <CDropdownItem href="#" onClick="">
           <CIcon icon={cilUser} className="me-2" />
           Profile
         </CDropdownItem>
-        <CDropdownItem href="#" onClick={logout}>
+        <CDropdownItem href="#" onClick={handleLogout}>
           <CIcon icon={cilLockLocked} className="me-2" />
           Logout
         </CDropdownItem>
