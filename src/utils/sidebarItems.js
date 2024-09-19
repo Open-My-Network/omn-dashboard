@@ -1,10 +1,11 @@
-import { Home, Person, School, Article } from "@mui/icons-material";
+import { Home, Person, School, Article, Lightbulb } from "@mui/icons-material";
 
 const sidebarItems = [
   { title: 'Home', icon: <Home /> , path:'/'},
   { title: 'Users', icon: <Person /> , path:'/users'},
   { title: 'School', icon: <School />, path:'/schools' },
   { title: 'Posts', icon: <Article />, path:'/articles' },
+  { title: 'Development Plan', icon: <Lightbulb />, path:'/development-plan' },
 ];
 
 export default sidebarItems;

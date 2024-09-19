@@ -25,8 +25,9 @@ import DeleteUser from "../components/DeleteUser";
 import UploadCSVModal from "../components/UploadCsv";
 import PaginationControl from "../../../components/PaginationControl";
 import { fetchUsers } from "../../../services/get_service";
+import AddUserDrawer from "../components/AddUser";
 
-let host = process.env.LOCALHOST || "http://localhost:3000";
+let host = process.env.LOCALHOST;
 
 const UserPage = () => {
   const [users, setUsers] = useState([]);
@@ -35,6 +36,7 @@ const UserPage = () => {
   const [error, setError] = useState(null);
   const [roleFilter, setRoleFilter] = useState("All");
   const [openUploadCSV, setOpenUploadCSV] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +46,7 @@ const UserPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const result = await fetchUsers(`${host}/api/users`, {
+        const result = await fetchUsers(`https://api.leepnetwork.com/users`, {
           page: currentPage,
           limit: rowsPerPage,
           sort: "desc",
@@ -82,6 +84,11 @@ const UserPage = () => {
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setCurrentPage(1); // Reset to the first page when rows per page changes
+  };
+
+  // Handle drawer toggle
+  const handleDrawerToggle = () => {
+    setDrawerOpen((prevOpen) => !prevOpen);
   };
 
   if (loading) {
@@ -123,13 +130,14 @@ const UserPage = () => {
           <Grid item xs={6} md={4} container justifyContent="flex-end">
             <ButtonGroup variant="outlined" aria-label="Basic button group">
               <Button onClick={() => setOpenUploadCSV(true)}>Upload</Button>
-              {/* <Button>Add</Button> */}
+              <Button onClick={handleDrawerToggle}>Add</Button>
             </ButtonGroup>
           </Grid>
         </Grid>
       </Box>
 
       <UploadCSVModal open={openUploadCSV} onClose={() => setOpenUploadCSV(false)} />
+      <AddUserDrawer open={drawerOpen} onClose={handleDrawerToggle} />
 
       <TableContainer component={Paper}>
         <Table>

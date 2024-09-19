@@ -1,158 +1,188 @@
 import React, { useState } from "react";
 import {
-  Grid,
+  Drawer,
+  Box,
   TextField,
+  Typography,
   Button,
-  MenuItem,
+  Divider,
+  IconButton,
   FormControl,
   InputLabel,
   Select,
-  FormControlLabel,
-  Checkbox,
-  Typography,
-  Box,
+  MenuItem,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-const roles = ["Administrator", "Teacher", "Student", "Author"];
-const schools = ["School A", "School B", "School C"];
-const grades = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5"];
-
-const AddUser = () => {
+const AddUserDrawer = ({ open, onClose }) => {
   const [formValues, setFormValues] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    role: "",
-    school: "",
-    grades: [],
+    user_email: "",
+    user_pass: "",
+    user_nicename: "",
+    role: "subscriber",
+    grade: "6",
+    section: "",
+    school_name: ""
   });
 
-  const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    if (type === "checkbox") {
-      setFormValues((prev) => ({
-        ...prev,
-        grades: checked
-          ? [...prev.grades, value]
-          : prev.grades.filter((grade) => grade !== value),
-      }));
-    } else {
-      setFormValues((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value
+    }));
+  };
+
+  const handleRoleChange = (e) => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      role: e.target.value
+    }));
+  };
+
+  const handleGradeChange = (e) => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      grade: e.target.value
+    }));
+  };
+
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      const userData = {
+        user_email: formValues.user_email,
+        user_pass: formValues.user_pass,
+        user_nicename: formValues.user_nicename,
+        meta: [
+          {
+            meta_key: "wp_capabilities",
+            meta_value: formValues.role
+          },
+          {
+            meta_key: "school_name",
+            meta_value: formValues.school_name
+          },
+          {
+            meta_key: "grades",
+            meta_value: [{ grade: formValues.grade }]
+          }
+        ]
+      };
+
+      await axios.post("http://localhost:3000/api/auth/register", userData);
+      toast.success("User added successfully!");
+      onClose(); // Close the drawer after adding the user
+      setFormValues({
+        user_email: "",
+        user_pass: "",
+        user_nicename: "",
+        role: "subscriber",
+        grade: "6",
+        section: "",
+        school_name: ""
+      });
+      // Optionally, trigger a refresh or callback to update the user list
+    } catch (error) {
+      toast.error("Failed to add user: " + error.message);
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Handle form submission
-    console.log(formValues);
-  };
-
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{ width: "100%", mx: "auto", p: 3 }}
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      sx={{ width: 400, flexShrink: 0 }}
     >
-      {/* Form Fields */}
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+      <Box sx={{ width: 400, p: 3 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6">Add User</Typography>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider sx={{ mb: 2 }} />
+        <form onSubmit={handleAddUser}>
           <TextField
             fullWidth
-            label="First Name"
-            name="firstName"
-            value={formValues.firstName}
-            onChange={handleChange}
+            margin="normal"
+            label="Email"
+            name="user_email"
+            value={formValues.user_email}
+            onChange={handleInputChange}
+            required
           />
-        </Grid>
-        <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Last Name"
-            name="lastName"
-            value={formValues.lastName}
-            onChange={handleChange}
+            margin="normal"
+            label="Password"
+            type="password"
+            name="user_pass"
+            value={formValues.user_pass}
+            onChange={handleInputChange}
+            required
           />
-        </Grid>
-      </Grid>
-      <TextField
-        fullWidth
-        label="Email"
-        type="email"
-        name="email"
-        value={formValues.email}
-        onChange={handleChange}
-        sx={{ mt: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="Password"
-        type="password"
-        name="password"
-        value={formValues.password}
-        onChange={handleChange}
-        sx={{ mt: 2 }}
-      />
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Display Name"
+            name="user_nicename"
+            value={formValues.user_nicename}
+            onChange={handleInputChange}
+            required
+          />
+          <FormControl fullWidth margin="normal">
             <InputLabel>Role</InputLabel>
             <Select
-              name="role"
               value={formValues.role}
-              onChange={handleChange}
+              onChange={handleRoleChange}
+              label="Role"
             >
-              {roles.map((role) => (
-                <MenuItem key={role} value={role}>
-                  {role}
-                </MenuItem>
-              ))}
+              <MenuItem value="administrator">Admin</MenuItem>
+              <MenuItem value="student">Student</MenuItem>
+              <MenuItem value="teacher">Teacher</MenuItem>
+              <MenuItem value="subscriber">Subscriber</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel>School</InputLabel>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="School Name"
+            name="school_name"
+            value={formValues.school_name}
+            onChange={handleInputChange}
+            required
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Grade</InputLabel>
             <Select
-              name="school"
-              value={formValues.school}
-              onChange={handleChange}
+              value={formValues.grade}
+              onChange={handleGradeChange}
+              label="Grade"
             >
-              {schools.map((school) => (
-                <MenuItem key={school} value={school}>
-                  {school}
-                </MenuItem>
+              {["6", "7", "8", "9", "10"].map((grade) => (
+                <MenuItem key={grade} value={grade}>{grade}</MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} sx={{ mt: 2 }}>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1">Grade</Typography>
-          {grades.map((grade) => (
-            <FormControlLabel
-              key={grade}
-              control={
-                <Checkbox
-                  value={grade}
-                  checked={formValues.grades.includes(grade)}
-                  onChange={handleChange}
-                />
-              }
-              label={grade}
-            />
-          ))}
-        </Grid>
-      </Grid>
-      <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
-        Submit
-      </Button>
-    </Box>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Section"
+            name="section"
+            value={formValues.section}
+            onChange={handleInputChange}
+          />
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Add User
+          </Button>
+        </form>
+      </Box>
+    </Drawer>
   );
 };
 
-export default AddUser;
+export default AddUserDrawer;
