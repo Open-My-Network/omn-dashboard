@@ -14,11 +14,17 @@ import {
   IconButton,
   Collapse,
   Box,
-  Typography
+  Typography,
+  Button,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { usePagination } from "../../../services/pagination_service";
 import { fetchUsers } from "../../../services/get_service";
+import AddSchoolModal from "../components/AddSchoolModal";
+import DeleteModal from "../components/DeleteSchoolModal";
 
 const SchoolPage = () => {
   const { pagination, changePage, changeRowsPerPage } = usePagination();
@@ -27,12 +33,15 @@ const SchoolPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false); // Delete modal state
+  const [schoolIdToDelete, setSchoolIdToDelete] = useState(null); // School ID to delete
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const result = await fetchUsers("http://3.218.118.83/api/schools", {
+        const result = await fetchUsers("http://localhost:3000/api/schools", {
           page: pagination.currentPage,
           limit: 10,
         });
@@ -68,8 +77,42 @@ const SchoolPage = () => {
     setExpandedRow(expandedRow === id ? null : id);
   };
 
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleOpenDeleteModal = (id) => {
+    setSchoolIdToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setSchoolIdToDelete(null);
+  };
+
+  const handleDeleteSuccess = () => {
+    // Refresh the data after deletion
+    setSchools((prevSchools) => prevSchools.filter((school) => school.id !== schoolIdToDelete));
+    setTotalCount((prevCount) => prevCount - 1);
+  };
+
   return (
     <Layout>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleOpenModal}
+        >
+          Add School
+        </Button>
+      </Box>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -95,18 +138,17 @@ const SchoolPage = () => {
                     <TableCell>{sch.sch_code}</TableCell>
                     <TableCell>{sch.sch_est}</TableCell>
                     <TableCell>
-                      {/* Update Button */}
-                      <Tooltip title="Update School">
-                        <IconButton aria-label="update">
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      {/* Expand Button */}
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleOpenDeleteModal(sch.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
                       <IconButton
                         aria-label="expand"
                         onClick={() => handleExpandClick(sch.id)}
                       >
-                        {expandedRow === sch.id ? '-' : '+'}
+                        {expandedRow === sch.id ? <ArrowDropUpIcon/> : <ArrowDropDownIcon/>}
                       </IconButton>
                     </TableCell>
                   </TableRow>
@@ -138,7 +180,9 @@ const SchoolPage = () => {
                                           <TableBody>
                                             {grade.sections.map((section) => (
                                               <TableRow key={section.id}>
-                                                <TableCell>{section.sec_name}</TableCell>
+                                                <TableCell>
+                                                  {section.sec_name}
+                                                </TableCell>
                                               </TableRow>
                                             ))}
                                           </TableBody>
@@ -169,6 +213,14 @@ const SchoolPage = () => {
           onRowsPerPageChange={changeRowsPerPage}
         />
       </TableContainer>
+
+      <AddSchoolModal open={openModal} onClose={handleCloseModal} />
+      <DeleteModal
+        open={deleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        schoolId={schoolIdToDelete}
+        onDelete={handleDeleteSuccess}
+      />
     </Layout>
   );
 };

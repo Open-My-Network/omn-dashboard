@@ -9,11 +9,10 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TablePagination,
   CircularProgress,
   Tooltip,
   IconButton,
-  Grid2 as Grid,
+  Grid,
   Select,
   MenuItem,
   InputLabel,
@@ -23,26 +22,31 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteUser from "../components/DeleteUser";
-import UploadCSV from "../components/UploadCsv";
-import { usePagination } from "../../../services/pagination_service";
+import UploadCSVModal from "../components/UploadCsv";
+import PaginationControl from "../../../components/PaginationControl";
 import { fetchUsers } from "../../../services/get_service";
 
+let host = process.env.LOCALHOST || "http://localhost:3000";
+
 const UserPage = () => {
-  const { pagination, changePage, changeRowsPerPage } = usePagination();
   const [users, setUsers] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [roleFilter, setRoleFilter] = useState("All"); // State for role filter
-  const [openUploadCSV, setOpenUploadCSV] = useState(false); // State for modal visibility
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [openUploadCSV, setOpenUploadCSV] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const result = await fetchUsers("http://3.218.118.83/api/users", {
-          page: pagination.currentPage,
-          limit: 10,
+        const result = await fetchUsers(`${host}/api/users`, {
+          page: currentPage,
+          limit: rowsPerPage,
           sort: "desc",
           role: roleFilter === "All" ? "" : roleFilter,
         });
@@ -56,7 +60,7 @@ const UserPage = () => {
     };
 
     fetchData();
-  }, [pagination.currentPage, pagination.limit, roleFilter]);
+  }, [currentPage, rowsPerPage, roleFilter]);
 
   // Handle deletion of user
   const handleUserDeleted = (userId) => {
@@ -66,6 +70,18 @@ const UserPage = () => {
   // Handle role filter change
   const handleRoleFilterChange = (event) => {
     setRoleFilter(event.target.value);
+    setCurrentPage(1); // Reset to the first page when the filter changes
+  };
+
+  // Handle page change
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage + 1); // MUI Pagination component uses 0-based indexing
+  };
+
+  // Handle rows per page change
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(1); // Reset to the first page when rows per page changes
   };
 
   if (loading) {
@@ -88,7 +104,7 @@ const UserPage = () => {
     <Layout>
       <Box sx={{ width: "100%" }} mb={3}>
         <Grid container spacing={2} alignItems="center">
-          <Grid size={6} container justifyContent="flex-start">
+          <Grid item xs={6} md={4}>
             <FormControl variant="outlined" fullWidth>
               <InputLabel>Role</InputLabel>
               <Select
@@ -104,16 +120,16 @@ const UserPage = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid size={6} container justifyContent="flex-end">
+          <Grid item xs={6} md={4} container justifyContent="flex-end">
             <ButtonGroup variant="outlined" aria-label="Basic button group">
               <Button onClick={() => setOpenUploadCSV(true)}>Upload</Button>
-              <Button>Add</Button>
+              {/* <Button>Add</Button> */}
             </ButtonGroup>
           </Grid>
         </Grid>
       </Box>
 
-      <UploadCSV open={openUploadCSV} onClose={() => setOpenUploadCSV(false)} />
+      <UploadCSVModal open={openUploadCSV} onClose={() => setOpenUploadCSV(false)} />
 
       <TableContainer component={Paper}>
         <Table>
@@ -162,14 +178,13 @@ const UserPage = () => {
             )}
           </TableBody>
         </Table>
-        <TablePagination
-          rowsPerPageOptions={[10]}
-          component="div"
+
+        <PaginationControl
           count={totalCount}
-          rowsPerPage={pagination.limit}
-          page={pagination.currentPage - 1}
-          onPageChange={(event, newPage) => changePage(event, newPage + 1)}
-          onRowsPerPageChange={changeRowsPerPage}
+          rowsPerPage={rowsPerPage}
+          page={currentPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
         />
       </TableContainer>
     </Layout>

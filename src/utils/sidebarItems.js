@@ -1,11 +1,10 @@
-import HomeIcon from '@mui/icons-material/Home';
-import PersonIcon from '@mui/icons-material/Person';
-import SchoolIcon from '@mui/icons-material/School';
+import { Home, Person, School, Article } from "@mui/icons-material";
 
 const sidebarItems = [
-  { title: 'Home', icon: <HomeIcon /> , path:'/'},
-  { title: 'Users', icon: <PersonIcon /> , path:'/users'},
-  { title: 'School', icon: <SchoolIcon />, path:'/schools' },
+  { title: 'Home', icon: <Home /> , path:'/'},
+  { title: 'Users', icon: <Person /> , path:'/users'},
+  { title: 'School', icon: <School />, path:'/schools' },
+  { title: 'Posts', icon: <Article />, path:'/articles' },
 ];
 
 export default sidebarItems;

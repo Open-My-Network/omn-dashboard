@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import HomePage from "./views/Home/pages/Homepage";
 import UsersPage from "./views/Users/pages/UserPage";
 import SchoolPage from './views/Schools/pages/SchoolPage';
+import PosPage from "./views/Post/pages/PostPage";
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/schools" element={<SchoolPage />} />
+        <Route path="/articles" element={<PosPage />} />
       </Routes>
       <ToastContainer
         position="top-right"
