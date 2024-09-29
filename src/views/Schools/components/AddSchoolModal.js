@@ -76,7 +76,7 @@ const AddSchoolModal = ({ open, onClose }) => {
     };
 
     try {
-      await axios.post("http://localhost:3000/api/schools", schoolData);
+      await axios.post("https://api.leepnetwork.com/schools", schoolData);
       toast.success("School added successfully"); // Success toast
       onClose(); // Close the modal on successful submission
     } catch (error) {

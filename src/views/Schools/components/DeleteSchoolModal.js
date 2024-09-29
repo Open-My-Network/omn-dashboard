@@ -25,7 +25,7 @@ const DeleteModal = ({ open, onClose, schoolId, onDelete }) => {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:3000/api/schools?schId=${schoolId}`);
+      await axios.delete(`https://api.leepnetwork.com/schools?schId=${schoolId}`);
       toast.success("School deleted successfully");
       onDelete(); // Callback to refresh the list
       onClose();

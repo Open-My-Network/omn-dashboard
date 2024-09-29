@@ -62,7 +62,7 @@ const PostPage = () => {
   const fetchPosts = async (page) => {
     setLoading(true);
     try {
-      const response = await fetchUsers("http://localhost:3000/api/posts", {
+      const response = await fetchUsers("https://api.leepnetwork.com/posts", {
         page: page,
         limit: rowsPerPage, // Use rowsPerPage for pagination
         post_type: postType,
