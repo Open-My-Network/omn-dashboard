@@ -27,8 +27,6 @@ import PaginationControl from "../../../components/PaginationControl";
 import { fetchUsers } from "../../../services/get_service";
 import AddUserDrawer from "../components/AddUser";
 
-let localhost = process.env.LOCALHOST;
-
 const UserPage = () => {
   const [users, setUsers] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
