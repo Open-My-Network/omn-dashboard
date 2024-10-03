@@ -59,25 +59,6 @@ const PostPage = () => {
     setFiltersApplied(true);
   };
 
-  const fetchPosts = async (page) => {
-    setLoading(true);
-    try {
-      const response = await fetchUsers("https://api.leepnetwork.com/posts", {
-        page: page,
-        limit: rowsPerPage, // Use rowsPerPage for pagination
-        post_type: postType,
-        post_status: postStatus,
-        sort_order: "desc",
-      });
-      setPosts(response.data);
-      setTotalCount(response.pagination.totalCount); // Update totalCount based on your API response
-    } catch (err) {
-      setError("Failed to fetch posts.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (!filtersApplied) {
       fetchPosts(currentPage);
