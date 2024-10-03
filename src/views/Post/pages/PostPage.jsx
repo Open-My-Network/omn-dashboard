@@ -44,13 +44,13 @@ const PostPage = () => {
 
   const handlePageChange = (event, newPage) => {
     setCurrentPage(newPage + 1); // MUI Pagination component uses 0-based indexing
-    fetchPosts(newPage + 1); // Fetch new page of posts
+    fetchUsers(newPage + 1); // Fetch new page of posts
   };
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setCurrentPage(1); // Reset to the first page when rows per page changes
-    fetchPosts(1); // Fetch posts for the first page with new rows per page
+    fetchUsers(1); // Fetch posts for the first page with new rows per page
   };
 
   const applyFilters = async () => {
