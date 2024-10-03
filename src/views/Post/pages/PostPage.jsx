@@ -27,12 +27,11 @@ const PostPage = () => {
   const [error, setError] = useState(null);
   const [postType, setPostType] = useState("post");
   const [postStatus, setPostStatus] = useState("publish");
-  const [filtersApplied, setFiltersApplied] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalCount, setTotalCount] = useState(0); // Added to track total number of posts
+  const [totalCount, setTotalCount] = useState(0);
 
   const handlePostTypeChange = (event) => {
     setPostType(event.target.value);
@@ -43,27 +42,33 @@ const PostPage = () => {
   };
 
   const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage + 1); // MUI Pagination component uses 0-based indexing
-    fetchUsers(newPage + 1); // Fetch new page of posts
+    setCurrentPage(newPage + 1);
   };
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1); // Reset to the first page when rows per page changes
-    fetchUsers(1); // Fetch posts for the first page with new rows per page
+    setCurrentPage(1);
   };
 
   const applyFilters = async () => {
-    setCurrentPage(1); // Reset to the first page when applying filters
-    await fetchUsers(1); // Fetch posts for the first page with new filters
-    setFiltersApplied(true);
+    setCurrentPage(1);
   };
 
   useEffect(() => {
-    if (!filtersApplied) {
-      fetchUsers(currentPage);
-    }
-  }, [currentPage, rowsPerPage, postType, postStatus, filtersApplied]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchUsers(currentPage, rowsPerPage, postType, postStatus);
+        setPosts(response.data);
+        setTotalCount(response.totalCount);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [currentPage, rowsPerPage, postType, postStatus]);
 
   if (loading) {
     return (
