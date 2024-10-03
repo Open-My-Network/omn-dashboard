@@ -55,13 +55,13 @@ const PostPage = () => {
 
   const applyFilters = async () => {
     setCurrentPage(1); // Reset to the first page when applying filters
-    await fetchPosts(1); // Fetch posts for the first page with new filters
+    await fetchUsers(1); // Fetch posts for the first page with new filters
     setFiltersApplied(true);
   };
 
   useEffect(() => {
     if (!filtersApplied) {
-      fetchPosts(currentPage);
+      fetchUsers(currentPage);
     }
   }, [currentPage, rowsPerPage, postType, postStatus, filtersApplied]);
 
