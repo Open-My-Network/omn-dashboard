@@ -1,10 +1,16 @@
-import React from 'react';
-import Layout from '../../../components/Layout';
+import React from "react";
+import Layout from "../../../components/Layout";
+import '../css/Homepage.css';
 
 const HomePage = () => (
   <Layout>
-    <h1>Home Page</h1>
-    <p>HOST - {process.env.HOST}</p>
+    <h3>Good Evening, Abishek Khanal</h3>
+    <div class="quote-container">
+      <blockquote class="quote">
+        "The only limit to our realization of tomorrow is our doubts of today."
+      </blockquote>
+      <cite class="author">- Franklin D. Roosevelt</cite>
+    </div>
   </Layout>
 );
 

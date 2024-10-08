@@ -11,32 +11,33 @@ const menuItems = [
 
 function Navbar({ handleDrawerToggle }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const openMenu = Boolean(anchorEl);
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorEl(event.currentTarget); // Open the menu
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setAnchorEl(null); // Close the menu
   };
 
   return (
     <AppBar position="fixed" sx={{ width: '100%', zIndex: 1201 }}>
       <Toolbar>
+        {/* Toggle Button for Sidebar */}
         <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle}>
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          Dashboard
+          Open My Network
         </Typography>
         <div>
           <IconButton
             size="small"
             edge="end"
-            aria-controls={open ? 'account-menu' : undefined}
+            aria-controls={openMenu ? 'account-menu' : undefined}
             aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
+            aria-expanded={openMenu ? 'true' : undefined}
             onClick={handleClick}
           >
             <Avatar alt="User Avatar" src="/static/images/avatar/1.jpg" />
@@ -44,7 +45,7 @@ function Navbar({ handleDrawerToggle }) {
           <Menu
             id="account-menu"
             anchorEl={anchorEl}
-            open={open}
+            open={openMenu}
             onClose={handleClose}
             PaperProps={{
               elevation: 0,

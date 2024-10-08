@@ -1,0 +1,20 @@
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+  }
+  
+  .loading-image {
+    width: 30%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+  
+  .loading-progress {
+    width: 30%; /* Adjust width of the progress bar */
+    margin: 10px auto; /* Center the progress bar */
+  }
+  

@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react"; // Import useState for managing loading state
+import { Routes, Route } from "react-router-dom"; // Removed useNavigate since it's not being used
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cookies from "js-cookie"; // Import js-cookie
 
-import ProtectedRoute from "./middleware/ProtectionRoute";
+import Loading from "./components/Loading";
+import Notfound from "./views/NotFound/Notfound";
 import HomePage from "./views/Home/pages/Homepage";
 import UsersPage from "./views/Users/pages/UserPage";
 import SchoolPage from "./views/Schools/pages/SchoolPage";
@@ -12,44 +14,44 @@ import Courses from "./views/Courses/pages/Courses";
 import DevPlanPage from "./views/DevelopmentPlan/pages/DevelopmentPlanPage";
 
 const App = () => {
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true); // State to manage loading status
 
   useEffect(() => {
-    // Check if there is a token in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
+    const queryParams = new URLSearchParams(window.location.search);
+    const token = queryParams.get("token");
 
+    // If token exists in the URL, set it as a cookie
     if (token) {
-      // Store the token in localStorage (or sessionStorage)
-      localStorage.setItem("jwt_token", token);
-
-      // Optionally remove the token from the URL to avoid showing it
-      navigate(window.location.pathname, { replace: true });
-    } else {
-      // If no token is found, check if it's stored
-      const storedToken = localStorage.getItem("jwt_token");
-      if (!storedToken) {
-        // Redirect to the external login page if no token is found
-        window.location.href = "https://openmynetwork.com/login";
-      }
+      Cookies.set("jwt_token", token); // Set the cookie with the name 'jwt_token'
     }
-  }, [navigate]);
+
+    // Check if the jwt_token cookie exists
+    const jwtToken = Cookies.get("jwt_token");
+    if (!jwtToken) {
+      // Redirect to login if the cookie doesn't exist
+      window.location.href = "https://openmynetwork.com/login"; // Use window.location.href for redirection
+    } else {
+      // If the token exists, set loading to false to render the main content
+      setLoading(false);
+    }
+  }, []); // Empty dependency array to run only on component mount
+
+  // Display a loading message or spinner while loading
+  if (loading) {
+    return <Loading/>; // You can customize this loading message or spinner
+  }
 
   return (
-    <Routes>
-      <ProtectedRoute path="/users" element={<UsersPage />} />
-      <ProtectedRoute path="/schools" element={<SchoolPage />} />
-      <ProtectedRoute path="/articles" element={<PostPage />} />
-      <ProtectedRoute path="/courses" element={<Courses />} />
-      <ProtectedRoute path="/development-plan" element={<DevPlanPage />} />
-      <ProtectedRoute path="/" element={<HomePage />} />
-      <Route
-        path="/login"
-        element={() => {
-          window.location.href = "https://openmynetwork.com/login";
-          return null;
-        }}
-      />
+    <>
+      <Routes>
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/schools" element={<SchoolPage />} />
+        <Route path="/articles" element={<PostPage />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/development-plan" element={<DevPlanPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<Notfound />} />
+      </Routes>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -58,7 +60,7 @@ const App = () => {
         closeOnClick
         rtl={false}
       />
-    </Routes>
+    </>
   );
 };
 
