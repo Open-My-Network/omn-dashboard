@@ -40,7 +40,7 @@ const SchoolPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const result = await fetchUsers("https://api.leepnetwork.com/schools", {
+        const result = await fetchUsers("schools", {
           page: pagination.currentPage,
           limit: 10,
         });

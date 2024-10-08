@@ -44,7 +44,7 @@ const UserPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const result = await fetchUsers(`https://api.leepnetwork.com/users`, {
+        const result = await fetchUsers('users', {
           page: currentPage,
           limit: rowsPerPage,
           sort: "desc",
